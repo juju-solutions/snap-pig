@@ -1,0 +1,197 @@
+name: pig
+version: '1.2.0-snap1'
+summary: Analyze large data sets with Pig Latin
+description: |
+  Apache Pig is a platform for analyzing large data sets that consists
+  of a high-level language for expressing data analysis programs,
+  coupled with infrastructure for evaluating these programs
+
+  This snap installs Pig 0.15.0 from the Apache Bigtop 1.2.0 release.
+grade: devel # must be 'stable' to release into candidate/stable channels
+confinement: strict # use 'strict' once you have the right plugs and slots
+
+apps:
+  pig:
+    command: wrappers/pig
+    plugs:
+      - 'network'
+
+plugs:
+  home:
+    interface: home
+  hadoop:
+    interface: content
+    content: hadoop
+    target: $SNAP/hadoop
+  hadoop-conf:
+    interface: content
+    content: hadoop-conf
+    target: $SNAP/etc/hadoop
+  zookeeper:
+    interface: content
+    content: zookeeper
+    target: $SNAP/zookeeper
+
+parts:
+  bigtop:
+    source: https://github.com/apache/bigtop.git
+    source-type: git
+    source-branch: branch-1.2
+    plugin: gradle
+    gradle-options: ['-b', 'packages.gradle', 'bom-snap']
+    build-packages:
+      - curl
+      - puppet-common
+    stage-packages:
+      - default-jdk-headless
+    prepare: |
+      # get bigtop buildreqs on the system
+      if [ `id -u` -ne 0 ]; then
+        PUPPET_CMD='sudo -E puppet apply'
+      else
+        PUPPET_CMD='puppet apply'
+      fi
+      ${PUPPET_CMD} -d --parser future --modulepath=".:/etc/puppet/modules" \
+        -e "include bigtop_toolchain::protobuf"
+      ${PUPPET_CMD} -d --parser future --modulepath=".:/etc/puppet/modules" \
+        -e "include bigtop_toolchain::packages"
+
+      # add a gradle task to generate a sourceable bom for use by other parts
+      echo 'task "bom-snap" () << {' >> packages.gradle
+      echo '  def bomWriter = new File("bigtop-snap.bom").newWriter()' >> packages.gradle
+      echo '  bomVersions.each { bomWriter << "$it\\n"}' >> packages.gradle
+      echo '  bomWriter.close()' >> packages.gradle
+      echo '}' >> packages.gradle
+
+      # there is no 'build' for bigtop-utils source, just set perms
+      chmod 755 bigtop-packages/src/common/bigtop-utils/bigtop-detect-*
+
+      # make sure utils point to the right default directory
+      for i in `ls bigtop-packages/src/common/bigtop-utils/bigtop-*`; do
+        sed -e 's|/etc/default|${SNAP}/etc/default|' -i $i; done
+
+      # point bigtop-utils to SNAP_DATA for additional classpath entries
+      echo 'export BIGTOP_CLASSPATH=${SNAP_DATA}/var/lib/bigtop' >> \
+        bigtop-packages/src/common/bigtop-utils/bigtop-utils.default
+
+      # set bigtop-utils java home to the jdk packed into the snap
+      echo 'export JAVA_HOME=${SNAP}/usr/lib/jvm/default-java' >> \
+        bigtop-packages/src/common/bigtop-utils/bigtop-utils.default
+    install: |
+      # adapted from bigtop/bigtop-packages/src/deb/bigtop-utils/rules
+      install -d -p -m 755 $SNAPCRAFT_PART_INSTALL/usr/lib/bigtop-utils/
+      install -p -m 755 bigtop-packages/src/common/bigtop-utils/bigtop-detect-javahome \
+        $SNAPCRAFT_PART_INSTALL/usr/lib/bigtop-utils/
+      install -p -m 755 bigtop-packages/src/common/bigtop-utils/bigtop-detect-javalibs \
+        $SNAPCRAFT_PART_INSTALL/usr/lib/bigtop-utils/
+      install -p -m 755 bigtop-packages/src/common/bigtop-utils/bigtop-detect-classpath \
+        $SNAPCRAFT_PART_INSTALL/usr/lib/bigtop-utils/
+      install -p -m 755 bigtop-packages/src/common/bigtop-utils/bigtop-monitor-service \
+        $SNAPCRAFT_PART_INSTALL/usr/lib/bigtop-utils/
+      install -d -p -m 755 $SNAPCRAFT_PART_INSTALL/bigtop-utils/etc/default
+      install -p -m 644 bigtop-packages/src/common/bigtop-utils/bigtop-utils.default \
+        $SNAPCRAFT_PART_INSTALL/etc/default/bigtop-utils
+    stage:
+      - etc/*
+      - usr/lib/*
+  bigtop-groovy:
+    after:
+      - bigtop
+    source: https://dl.bintray.com/groovy/maven/apache-groovy-binary-2.4.10.zip
+    plugin: dump
+    prepare: |
+      cp ../../bigtop/build/bigtop-snap.bom \
+        ../../bigtop/build/bigtop-packages/src/common/bigtop-groovy/bigtop.bom
+      chmod 755 ../../bigtop/build/bigtop-packages/src/common/bigtop-groovy/do-component-build
+      chmod 755 ../../bigtop/build/bigtop-packages/src/common/bigtop-groovy/install_groovy.sh
+    build: |
+      ../../bigtop/build/bigtop-packages/src/common/bigtop-groovy/do-component-build
+    install: |
+      # adapted from bigtop/bigtop-packages/src/deb/bigtop-groovy/rules
+      ../../bigtop/build/bigtop-packages/src/common/bigtop-groovy/install_groovy.sh \
+        --build-dir=groovy-2.4.10 \
+        --prefix=$SNAPCRAFT_PART_INSTALL \
+        --bin-dir=usr/lib/bigtop-groovy/bin \
+        --version=2.4.10 \
+        --lib-dir=usr/lib/bigtop-groovy/lib \
+        --conf-dir=usr/lib/bigtop-groovy/conf
+    stage:
+      - usr/lib/*
+  bigtop-jsvc:
+    after:
+      - bigtop
+    source: https://archive.apache.org/dist/commons/daemon/source/commons-daemon-1.0.15-native-src.tar.gz
+    plugin: autotools
+    prepare: |
+      cp ../../bigtop/build/bigtop-snap.bom \
+        ../../bigtop/build/bigtop-packages/src/common/bigtop-jsvc/bigtop.bom
+      chmod 755 ../../bigtop/build/bigtop-packages/src/common/bigtop-jsvc/do-component-build
+      chmod 755 ../../bigtop/build/bigtop-packages/src/common/bigtop-jsvc/install_jsvc.sh
+
+      # patch jsvc sources with bigtop-specific changes
+      for i in `ls ../../bigtop/build/bigtop-packages/src/common/bigtop-jsvc/patch*.diff`; do \
+        patch -p1 -i $i; done
+    build: |
+      # the autotools plugin ensures we get the right build tools, but we \
+      # still want to use the bigtop build recipe.
+      bash -c '. ../../bigtop/build/bigtop-packages/src/common/bigtop-utils/bigtop-detect-javahome && \
+        ../../bigtop/build/bigtop-packages/src/common/bigtop-jsvc/do-component-build'
+    install: |
+      # adapted from bigtop/bigtop-packages/src/deb/bigtop-jsvc/rules
+      ../../bigtop/build/bigtop-packages/src/common/bigtop-jsvc/install_jsvc.sh \
+        --build-dir=. \
+        --prefix=$SNAPCRAFT_PART_INSTALL
+    stage:
+      - usr/lib/*
+      - usr/share/*
+  pig:
+    after:
+      - bigtop-groovy
+      - bigtop-jsvc
+    source: http://svn.apache.org/repos/asf/pig/tags/release-0.15.0
+    source-type: svn
+    plugin: dump
+    build-packages:
+      - gzip
+    prepare: |
+      cp ../../bigtop/build/bigtop-snap.bom \
+        ../../bigtop/build/bigtop-packages/src/common/pig/bigtop.bom
+      chmod 755 ../../bigtop/build/bigtop-packages/src/common/pig/do-component-build
+      chmod 755 ../../bigtop/build/bigtop-packages/src/common/pig/install_pig.sh
+
+      # patch bigtop sources with snap-specific changes for pig
+      for i in `ls ../../../snap/sources/patch*.diff`; do \
+        patch -d ../../bigtop/build -p1 -i $i; done
+
+      # patch pig sources with bigtop-specific changes
+      for i in `ls ../../bigtop/build/bigtop-packages/src/common/pig/patch*.diff`; do \
+        patch -p1 -i $i; done
+
+      # update pig sources with snap-specific changes
+      sed -e 's/getProperty("user.home")/getenv("SNAP_USER_DATA")/' -i src/org/apache/pig/Main.java
+      sed -e 's/getProperty("user.dir")/getenv("SNAP_USER_DATA")/' -i src/org/apache/pig/Main.java
+    build: |
+      ../../bigtop/build/bigtop-packages/src/common/pig/do-component-build
+    install: |
+      # adapted from bigtop/bigtop-packages/src/deb/pig/rules
+      ../../bigtop/build/bigtop-packages/src/common/pig/install_pig.sh \
+        --build-dir=build \
+        --prefix=$SNAPCRAFT_PART_INSTALL \
+        --doc-dir=/usr/share/doc/pig \
+        --examples-dir=/usr/share/doc/pig/examples
+
+      # FIXME: hack a $SNAP_DATA symlink since we cant use $SNAP_DATA during build
+      rm -f $SNAPCRAFT_PART_INSTALL/usr/lib/pig/conf
+      ln -s /var/snap/pig/current/etc/pig/conf $SNAPCRAFT_PART_INSTALL/usr/lib/pig/conf
+
+      # create dirs for potential slot contents
+      install -d -m 0755 $SNAPCRAFT_PART_INSTALL/hadoop
+      install -d -m 0755 $SNAPCRAFT_PART_INSTALL/etc/hadoop
+      install -d -m 0755 $SNAPCRAFT_PART_INSTALL/hbase
+      install -d -m 0755 $SNAPCRAFT_PART_INSTALL/hive
+      install -d -m 0755 $SNAPCRAFT_PART_INSTALL/zookeeper
+  wrappers:
+    after:
+      - pig
+    source: snap/
+    plugin: dump

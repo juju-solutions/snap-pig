@@ -1,0 +1,30 @@
+#!/bin/bash
+
+###############################################################################
+# Wrapper for pig command
+###############################################################################
+
+# Setup environment
+# NB: all snaps that plug into hadoop are expected to have $SNAP/hadoop and
+# $SNAP/etc/hadoop dirs that will be automatically mounted when connected.
+if [ -e ${SNAP}/hadoop/wrappers/common-wrapper.sh ]; then
+  . ${SNAP}/hadoop/wrappers/common-wrapper.sh
+else
+  echo "ERROR: Could not find 'common-wrapper.sh':"
+  echo "${SNAP}/hadoop/wrappers/common-wrapper.sh"
+  echo "Please verify the hadoop snap is installed and connected."
+  exit 1
+fi
+
+export HADOOP_HOME=${SNAP}/hadoop/usr/lib/hadoop
+export HBASE_HOME=${SNAP}/hbase/usr/lib/hbase
+export HBASE_CONF_DIR=${SNAP}/hbase/etc/hbase/conf
+export HCAT_HOME=${SNAP}/hive/usr/lib/hive-hcatalog
+export HIVE_HOME=${SNAP}/hive/usr/lib/hive
+export ZOOKEEPER_HOME=${SNAP}/zookeeper/usr/lib/zookeeper
+
+# Update path so pig can find $SNAP/hadoop/wrappers (like 'hadoop')
+export PATH=${SNAP}/hadoop/wrappers:$PATH
+
+# Run pig
+exec ${SNAP}/usr/lib/pig/bin/pig "$@"

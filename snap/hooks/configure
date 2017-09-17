@@ -1,0 +1,13 @@
+#!/bin/bash
+
+set -eux
+
+# setup root-writable var dirs
+mkdir -p ${SNAP_DATA}/var/lib/bigtop
+
+# setup pig config
+mkdir -p ${SNAP_DATA}/etc/pig
+cp -a ${SNAP}/etc/pig/conf.dist ${SNAP_DATA}/etc/pig
+if [ ! -e ${SNAP_DATA}/etc/pig/conf ]; then
+  ln -s conf.dist ${SNAP_DATA}/etc/pig/conf
+fi
