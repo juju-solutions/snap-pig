@@ -154,6 +154,7 @@ parts:
     plugin: ant
     ant-build-targets:
       - clean
+      - ivy-download
     build-packages:
       - gzip
       - maven
@@ -178,7 +179,7 @@ parts:
       # copy sources to expected locations; otherwise, ant cant find ivy on
       # the launchpad builders (weird java/ant/ivy proxy issue causing a 407)
       mkdir -p ivy
-      cp ../../../snap/sources/ivy*.jar ivy
+      cp ../../../snap/sources/ivy*.jar ./ivy/
 
     install: |
       # during the build phase, the ant plugin will do a simple clean target
