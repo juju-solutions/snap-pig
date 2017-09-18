@@ -1,12 +1,14 @@
 --- a/bigtop-packages/src/common/pig/do-component-build	2016-05-20 10:42:15.000000000 -0500
 +++ b/bigtop-packages/src/common/pig/do-component-build	2017-09-07 15:29:10.000000000 -0500
-@@ -58,7 +58,8 @@ done
-
+@@ -59,8 +59,8 @@ done
  echo "forrest.maxmemory=256m" >> src/docs/forrest.properties
 
--export ANT_OPTS="-Xmx4096m"
-+export BUILD_OPTS="$ANT_OPTS $BUILD_OPTS"
-+export ANT_OPTS="$ANT_OPTS -Xmx4096m"
- ant $BUILD_OPTS clean published pigunit-jar smoketests-jar javadoc "$@"
+ export ANT_OPTS="-Xmx4096m"
+-ant $BUILD_OPTS clean published pigunit-jar smoketests-jar javadoc "$@"
++ant $BUILD_OPTS -autoproxy clean published pigunit-jar smoketests-jar javadoc "$@"
  for build_file in contrib/piggybank/java/build.xml ; do
-   ant $BUILD_OPTS -buildfile $build_file clean jar "$@"
+-  ant $BUILD_OPTS -buildfile $build_file clean jar "$@"
++  ant $BUILD_OPTS -autoproxy -buildfile $build_file clean jar "$@"
+ done
+-ant $BUILD_OPTS tar "$@"
++ant $BUILD_OPTS -autoproxy tar "$@"
