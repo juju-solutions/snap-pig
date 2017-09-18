@@ -148,11 +148,15 @@ parts:
     after:
       - bigtop-groovy
       - bigtop-jsvc
-    source: http://svn.apache.org/repos/asf/pig/tags/release-0.15.0
-    source-type: svn
-    plugin: dump
+    source: https://github.com/apache/pig.git
+    source-type: git
+    source-branch: branch-0.15
+    plugin: ant
+    ant-build-targets:
+      - clean
     build-packages:
       - gzip
+      - maven
     prepare: |
       cp ../../bigtop/build/bigtop-snap.bom \
         ../../bigtop/build/bigtop-packages/src/common/pig/bigtop.bom
@@ -170,9 +174,12 @@ parts:
       # update pig sources with snap-specific changes
       sed -e 's/getProperty("user.home")/getenv("SNAP_USER_DATA")/' -i src/org/apache/pig/Main.java
       sed -e 's/getProperty("user.dir")/getenv("SNAP_USER_DATA")/' -i src/org/apache/pig/Main.java
-    build: |
-      ../../bigtop/build/bigtop-packages/src/common/pig/do-component-build
     install: |
+      # during the build phase, the ant plugin will do a simple clean target
+      # that sets env proxies for ant, but we still want to use the bigtop
+      # build recipe for the actual build. do it first thing during install.
+      ../../bigtop/build/bigtop-packages/src/common/pig/do-component-build
+
       # adapted from bigtop/bigtop-packages/src/deb/pig/rules
       ../../bigtop/build/bigtop-packages/src/common/pig/install_pig.sh \
         --build-dir=build \
@@ -195,3 +202,5 @@ parts:
       - pig
     source: snap/
     plugin: dump
+    stage:
+      - wrappers/*

@@ -1,36 +1,6 @@
 --- a/bigtop-packages/src/common/pig/install_pig.sh	2016-05-20 10:42:15.000000000 -0500
 +++ b/bigtop-packages/src/common/pig/install_pig.sh	2017-09-07 15:29:10.000000000 -0500
-@@ -125,22 +125,28 @@
- #!/bin/bash
-
- # Autodetect JAVA_HOME if not defined
--. /usr/lib/bigtop-utils/bigtop-detect-javahome
-+. \${SNAP}/usr/lib/bigtop-utils/bigtop-detect-javahome
-
--export HADOOP_PREFIX=\${HADOOP_PREFIX:-/usr/lib/hadoop}
--export HADOOP_CONF_DIR=\${HADOOP_CONF_DIR:-/etc/hadoop/conf}
--export HBASE_HOME=\${HBASE_HOME:-/usr/lib/hbase}
--export HBASE_CONF_DIR=\${HBASE_HOME}/conf
--export ZOOKEEPER_HOME=\${ZOOKEEPER_HOME:-/usr/lib/zookeeper}
--export HIVE_HOME=\${HIVE_HOME:-/usr/lib/hive}
--export HCAT_HOME=\${HCAT_HOME:-/usr/lib/hive-hcatalog}
-+if [ -x \${SNAP}/hadoop/usr/bin/hadoop ]; then
-+  export HADOOP_PREFIX=\${SNAP}/hadoop/usr
-+  export HADOOP_CONF_DIR=\${SNAP}/hadoop/etc/hadoop/conf
-+  export PATH=\${SNAP}/hadoop/usr/bin:$PATH
-+else
-+  export HADOOP_PREFIX=\${HADOOP_PREFIX:-/usr/lib/hadoop}
-+  export HADOOP_CONF_DIR=\${HADOOP_CONF_DIR:-/etc/hadoop/conf}
-+fi
-+export HBASE_HOME=\${SNAP}/hbase/usr/lib/hbase
-+export HBASE_CONF_DIR=\${SNAP}/hbase/etc/hbase/conf
-+export ZOOKEEPER_HOME=\${SNAP}/zookeeper/usr/lib/zookeeper
-+export HIVE_HOME=\${SNAP}/hive/usr/lib/hive
-+export HCAT_HOME=\${SNAP}/hive/usr/lib/hive-hcatalog
-
--exec $INSTALLED_LIB_DIR/bin/pig "\$@"
-+exec \${SNAP}$INSTALLED_LIB_DIR/bin/pig "\$@"
- EOF
+@@ -140,7 +140,7 @@
  chmod 755 $PREFIX/$BIN_DIR/pig
 
  install -d -m 0755 $PREFIX/$MAN_DIR
@@ -39,7 +9,7 @@
 
  # Copy in the docs
  install -d -m 0755 $PREFIX/$DOC_DIR
-@@ -150,9 +156,9 @@
+@@ -150,9 +150,9 @@
  # Tutorial
  install -d -m 0755 $PREFIX/$EXAMPLES_DIR
  (cd $BUILD_DIR/tar/pig*/tutorial && tar -cf - .)|(cd $PREFIX/$EXAMPLES_DIR && tar -xf -)
