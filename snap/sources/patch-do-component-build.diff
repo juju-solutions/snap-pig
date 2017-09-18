@@ -1,22 +1,11 @@
 --- a/bigtop-packages/src/common/pig/do-component-build	2016-05-20 10:42:15.000000000 -0500
 +++ b/bigtop-packages/src/common/pig/do-component-build	2017-09-07 15:29:10.000000000 -0500
-@@ -43,6 +43,10 @@ export FORREST_HOME=`pwd`/apache-forrest
-
- BUILD_OPTS="-Djavac.version=${JDK_VERSION} -Dforrest.home=${FORREST_HOME} -Dversion=${PIG_VERSION} -Dhadoopversion=23"
-
-+# Snap builders update ANT_OPTS with proxy settings. Make sure those settings
-+# are also available to maven.
-+export MAVEN_OPTS="$ANT_OPTS"
-+
- # FIXME: there's a weird synchronization issue between ivy and Maven caches wrt. jetty
- # If we don't do the following the build fails with (note zip instead of jar):
- # [ivy:resolve]                ::::::::::::::::::::::::::::::::::::::::::::::
-@@ -58,7 +62,7 @@ done
+@@ -58,7 +58,7 @@ done
 
  echo "forrest.maxmemory=256m" >> src/docs/forrest.properties
 
 -export ANT_OPTS="-Xmx4096m"
-+export ANT_OPTS="$ANT_OPTS -Xmx4096m"
++BUILD_OPTS="$ANT_OPTS $BUILD_OPTS -Xmx4096m"
  ant $BUILD_OPTS clean published pigunit-jar smoketests-jar javadoc "$@"
  for build_file in contrib/piggybank/java/build.xml ; do
    ant $BUILD_OPTS -buildfile $build_file clean jar "$@"
