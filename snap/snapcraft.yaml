@@ -154,7 +154,6 @@ parts:
     plugin: ant
     ant-build-targets:
       - clean
-      - ivy-download
     build-packages:
       - gzip
       - maven
