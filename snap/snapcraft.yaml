@@ -154,7 +154,6 @@ parts:
     plugin: ant
     ant-build-targets:
       - clean
-      - ivy-download
     build-packages:
       - gzip
       - maven
@@ -176,16 +175,26 @@ parts:
       sed -e 's/getProperty("user.home")/getenv("SNAP_USER_DATA")/' -i src/org/apache/pig/Main.java
       sed -e 's/getProperty("user.dir")/getenv("SNAP_USER_DATA")/' -i src/org/apache/pig/Main.java
 
-      # copy sources to expected locations; otherwise, ant cant find ivy on
-      # the launchpad builders (weird java/ant/ivy proxy issue causing a 407)
-      mkdir -p ivy
-      cp ../../../snap/sources/ivy*.jar ./ivy/
-
+      # proxied builds need help when ant tries to get ivy (ANT_OPTS is not enough)
+      # NB: ${http.var} will be set by the ant plugin when appropriate
+      if [ -n ${http_proxy} ]; then
+        sed -e '/name="ivy-download"/a \
+          <setproxy proxyhost="${http.proxyHost}" proxyport="${http.proxyPort}" \
+              proxyuser="${http.proxyUser}" proxypassword="${http.proxyPassword}"/>' \
+          -i build.xml
+      elif [ -n ${https_proxy} ]; then
+        sed -e '/name="ivy-download"/a \
+          <setproxy proxyhost="${https.proxyHost}" proxyport="${https.proxyPort}" \
+              proxyuser="${https.proxyUser}" proxypassword="${https.proxyPassword}"/>' \
+          -i build.xml
+      fi
     install: |
-      # during the build phase, the ant plugin will do a simple clean target
-      # that sets env proxies for ant, but we still want to use the bigtop
-      # build recipe for the actual build. do it first thing during install.
-      ../../bigtop/build/bigtop-packages/src/common/pig/do-component-build
+      # Do not define build tasks because we want the ant plugin to setup any
+      # proxy config (otherwise, we'd have to grok the env and do it ourselves).
+      # We still want to use the bigtop build recipe for the actual build, so
+      # do it first thing during install.
+      # NB: exit 1 on failure since install step failures do not stop the build
+      ../../bigtop/build/bigtop-packages/src/common/pig/do-component-build || exit 1
 
       # adapted from bigtop/bigtop-packages/src/deb/pig/rules
       ../../bigtop/build/bigtop-packages/src/common/pig/install_pig.sh \
