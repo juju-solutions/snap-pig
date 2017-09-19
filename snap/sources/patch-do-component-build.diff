@@ -5,7 +5,7 @@
  echo "forrest.maxmemory=256m" >> src/docs/forrest.properties
 
 -export ANT_OPTS="-Xmx4096m"
-+export ANT_ARGS="-autoproxy $ANT_OPTS" ANT_OPTS="$ANT_OPTS -Xmx4096m"
++export ANT_ARGS="-verbose -debug $ANT_OPTS" ANT_OPTS="$ANT_OPTS -Xmx4096m"
  ant $BUILD_OPTS clean published pigunit-jar smoketests-jar javadoc "$@"
  for build_file in contrib/piggybank/java/build.xml ; do
    ant $BUILD_OPTS -buildfile $build_file clean jar "$@"
