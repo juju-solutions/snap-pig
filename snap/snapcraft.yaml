@@ -195,6 +195,9 @@ parts:
           -i build.xml
       fi
     install: |
+      wget http://repo.apache.maven.org/maven2/xmlenc/xmlenc/0.52/xmlenc-0.52.pom || echo "FAILED CENTRAL"
+      wget http://repo2.maven.org/maven2/xmlenc/xmlenc/0.52/xmlenc-0.52.pom || echo "FAILED MAVEN2"
+
       # Do not define build tasks because we want the ant plugin to setup any
       # proxy config (otherwise, we'd have to grok the env and do it ourselves).
       # We still want to use the bigtop build recipe for the actual build, so
