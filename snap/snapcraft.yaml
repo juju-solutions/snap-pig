@@ -181,9 +181,15 @@ parts:
         sed -e '/name="ivy-download"/a \
           <setproxy proxyhost="${http.proxyHost}" proxyport="${http.proxyPort}" \
               proxyuser="${http.proxyUser}" proxypassword="${http.proxyPassword}"/>' \
+          -e '/name="ivy-resolve"/a \
+          <setproxy proxyhost="${http.proxyHost}" proxyport="${http.proxyPort}" \
+              proxyuser="${http.proxyUser}" proxypassword="${http.proxyPassword}"/>' \
           -i build.xml
       elif [ -n ${https_proxy} ]; then
         sed -e '/name="ivy-download"/a \
+          <setproxy proxyhost="${https.proxyHost}" proxyport="${https.proxyPort}" \
+              proxyuser="${https.proxyUser}" proxypassword="${https.proxyPassword}"/>' \
+          -e '/name="ivy-resolve"/a \
           <setproxy proxyhost="${https.proxyHost}" proxyport="${https.proxyPort}" \
               proxyuser="${https.proxyUser}" proxypassword="${https.proxyPassword}"/>' \
           -i build.xml
