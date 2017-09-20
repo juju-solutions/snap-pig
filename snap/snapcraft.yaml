@@ -187,6 +187,7 @@ parts:
               proxyuser="${http.proxyUser}" proxypassword="${http.proxyPassword}"/>' \
           -i build.xml
         sed -e '/ref="jboss-maven2"/d' -e '/ref="apache-snapshots"/d' -i ivy/ivysettings.xml
+        sed -e 's|m2compatible="true"/|m2compatible="true" usepoms="false"/|' -i ivy/ivysettings.xml
       elif [ -n ${https_proxy} ]; then
         sed -e '/name="ivy-download"/a \
           <setproxy proxyhost="${https.proxyHost}" proxyport="${https.proxyPort}" \
