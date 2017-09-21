@@ -181,14 +181,14 @@ parts:
       # NB: ${http.var} will be set by the ant plugin when appropriate
       if [ -n "${http_proxy}" ]; then
         sed -e '/name="ivy-download"/a \
-          <setproxy proxyhost="${https.proxyHost}" proxyport="${https.proxyPort}" \
-              proxyuser="${https.proxyUser}" proxypassword="${https.proxyPassword}"/>' \
+          <setproxy proxyhost="${http.proxyHost}" proxyport="${http.proxyPort}" \
+              proxyuser="${http.proxyUser}" proxypassword="${http.proxyPassword}"/>' \
           -e '/name="ivy-resolve"/a \
-          <setproxy proxyhost="${https.proxyHost}" proxyport="${https.proxyPort}" \
-              proxyuser="${https.proxyUser}" proxypassword="${https.proxyPassword}"/>' \
+          <setproxy proxyhost="${http.proxyHost}" proxyport="${http.proxyPort}" \
+              proxyuser="${http.proxyUser}" proxypassword="${http.proxyPassword}"/>' \
           -e '/name="ivy-compile"/a \
-          <setproxy proxyhost="${https.proxyHost}" proxyport="${https.proxyPort}" \
-              proxyuser="${https.proxyUser}" proxypassword="${https.proxyPassword}"/>' \
+          <setproxy proxyhost="${http.proxyHost}" proxyport="${http.proxyPort}" \
+              proxyuser="${http.proxyUser}" proxypassword="${http.proxyPassword}"/>' \
           -i build.xml
       elif [ -n "${https_proxy}" ]; then
         sed -e '/name="ivy-download"/a \
@@ -216,11 +216,11 @@ parts:
       wget http://repo2.maven.org/maven2/xmlenc/xmlenc/0.52/xmlenc-0.52.pom || echo "FAILED MAVEN2"
 
       python3 -c "from snapcraft.plugins import maven; maven._create_settings('./mvn-settings.xml')"
-      mvn -s mvn-settings.xml -f build/ivy/maven/generated.pom install
-      mvn -s mvn-settings.xml -f ivy/pig.pom install
-      mvn -s mvn-settings.xml -f ivy/piggybank.pom install
-      mvn -s mvn-settings.xml -f ivy/pigunit.pom install
-      mvn -s mvn-settings.xml -f ivy/pigsmoke.pom install
+      #mvn -s mvn-settings.xml -f build/ivy/maven/generated.pom install
+      #mvn -s mvn-settings.xml -f ivy/pig.pom install
+      #mvn -s mvn-settings.xml -f ivy/piggybank.pom install
+      #mvn -s mvn-settings.xml -f ivy/pigunit.pom install
+      #mvn -s mvn-settings.xml -f ivy/pigsmoke.pom install
 
       # Do not define build tasks because we want the ant plugin to setup any
       # proxy config (otherwise, we'd have to grok the env and do it ourselves).
