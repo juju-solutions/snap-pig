@@ -181,14 +181,14 @@ parts:
       # NB: ${http.var} will be set by the ant plugin when appropriate
       if [ -n "${http_proxy}" ]; then
         sed -e '/name="ivy-download"/a \
-          <setproxy proxyhost="${http.proxyHost}" proxyport="${http.proxyPort}" \
-              proxyuser="${http.proxyUser}" proxypassword="${http.proxyPassword}"/>' \
+          <setproxy proxyhost="${https.proxyHost}" proxyport="${https.proxyPort}" \
+              proxyuser="${https.proxyUser}" proxypassword="${https.proxyPassword}"/>' \
           -e '/name="ivy-resolve"/a \
-          <setproxy proxyhost="${http.proxyHost}" proxyport="${http.proxyPort}" \
-              proxyuser="${http.proxyUser}" proxypassword="${http.proxyPassword}"/>' \
+          <setproxy proxyhost="${https.proxyHost}" proxyport="${https.proxyPort}" \
+              proxyuser="${https.proxyUser}" proxypassword="${https.proxyPassword}"/>' \
           -e '/name="ivy-compile"/a \
-          <setproxy proxyhost="${http.proxyHost}" proxyport="${http.proxyPort}" \
-              proxyuser="${http.proxyUser}" proxypassword="${http.proxyPassword}"/>' \
+          <setproxy proxyhost="${https.proxyHost}" proxyport="${https.proxyPort}" \
+              proxyuser="${https.proxyUser}" proxypassword="${https.proxyPassword}"/>' \
           -i build.xml
       elif [ -n "${https_proxy}" ]; then
         sed -e '/name="ivy-download"/a \
