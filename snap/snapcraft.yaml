@@ -187,6 +187,13 @@ parts:
           -i build.xml
         sed -e '/ref="jboss-maven2"/d' -e '/ref="apache-snapshots"/d' -i ivy/ivysettings.xml
         sed -e 's|m2compatible="true"/|m2compatible="true" usepoms="false" useMavenMetadata="false"/|' -i ivy/ivysettings.xml
+        sed -e '/name="maven2"/a \
+          <url name="testrepo"> \
+            <artifact pattern="http://repo1.maven.org/maven2/[organisation]/[module]/[revision]/[artifact]-[revision].[ext]"/> \
+          </url>' \
+          -e '/ref="maven2"/a \
+          <resolver ref="testrepo"/>' \
+          -i ivy/ivysettings.xml
       elif [ -n ${https_proxy} ]; then
         sed -e '/name="ivy-download"/a \
           <setproxy proxyhost="${https.proxyHost}" proxyport="${https.proxyPort}" \
