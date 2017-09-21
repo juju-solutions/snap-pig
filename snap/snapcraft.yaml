@@ -217,11 +217,11 @@ parts:
       wget http://repo2.maven.org/maven2/xmlenc/xmlenc/0.52/xmlenc-0.52.pom || echo "FAILED MAVEN2"
 
       python3 -c "from snapcraft.plugins import maven; maven._create_settings('./mvn-settings.xml')"
-      sed -e '/optional>true/d' -i build/ivy/maven/generated.pom
-      sed -e '/<artifactId>hadoop-yarn-server</artifactId>/a \
+      sed -e '/<optional>true</d' \
+        -e '/<artifactId>hadoop-yarn-server</a \
         <type>pom</type> \
         <scope>import</scope>' \
-        -e '/<artifactId>tez</artifactId>/a \
+        -e '/<artifactId>tez</a \
         <type>pom</type> \
         <scope>import</scope>' \
         -i build/ivy/maven/generated.pom
