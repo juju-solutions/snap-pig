@@ -190,6 +190,7 @@ parts:
           <setproxy proxyhost="${http.proxyHost}" proxyport="${http.proxyPort}" \
               proxyuser="${http.proxyUser}" proxypassword="${http.proxyPassword}"/>' \
           -i build.xml
+        sed -e 's|conf="compile,runtime,test">|>|' -i build.xml
       elif [ -n "${https_proxy}" ]; then
         sed -e '/name="ivy-download"/a \
           <setproxy proxyhost="${https.proxyHost}" proxyport="${https.proxyPort}" \
@@ -216,7 +217,7 @@ parts:
       wget http://repo2.maven.org/maven2/xmlenc/xmlenc/0.52/xmlenc-0.52.pom || echo "FAILED MAVEN2"
 
       python3 -c "from snapcraft.plugins import maven; maven._create_settings('./mvn-settings.xml')"
-      #mvn -s mvn-settings.xml -f build/ivy/maven/generated.pom install
+      mvn -s mvn-settings.xml -f build/ivy/maven/generated.pom install
       #mvn -s mvn-settings.xml -f ivy/pig.pom install
       #mvn -s mvn-settings.xml -f ivy/piggybank.pom install
       #mvn -s mvn-settings.xml -f ivy/pigunit.pom install
