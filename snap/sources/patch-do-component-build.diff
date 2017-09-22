@@ -1,18 +1,11 @@
 --- a/bigtop-packages/src/common/pig/do-component-build	2016-05-20 10:42:15.000000000 -0500
 +++ b/bigtop-packages/src/common/pig/do-component-build	2017-09-07 15:29:10.000000000 -0500
-@@ -52,13 +52,13 @@ BUILD_OPTS="-Djavac.version=${JDK_VERSIO
- # [ivy:resolve]                :: org.mortbay.jetty#jetty;6.1.26!jetty.zip
- # [ivy:resolve]                ::::::::::::::::::::::::::::::::::::::::::::::
- for h in ${HOME} `mvn help:system | grep '^user.home=' | cut -f2 -d=` ; do
--  rm -rf ${h}/.ivy2/cache/*jetty ${h}/.m2/repository/org/mortbay ${h}/.m2/repository/org/eclipse/jetty
-+  rm -rf ${h}/.ivy2/cache/*jetty ${h}/.m2/repository/org/eclipse/jetty
- done
-
+@@ -58,7 +58,7 @@ done
 
  echo "forrest.maxmemory=256m" >> src/docs/forrest.properties
 
 -export ANT_OPTS="-Xmx4096m"
-+export ANT_ARGS="-verbose -debug $ANT_OPTS" ANT_OPTS="-Dmvnrepo=http://repo.maven.apache.org/maven2 $ANT_OPTS -Xmx4096m"
++export ANT_ARGS="-verbose -debug" ANT_OPTS="$ANT_OPTS -Xmx4096m"
  ant $BUILD_OPTS clean published pigunit-jar smoketests-jar javadoc "$@"
  for build_file in contrib/piggybank/java/build.xml ; do
    ant $BUILD_OPTS -buildfile $build_file clean jar "$@"
