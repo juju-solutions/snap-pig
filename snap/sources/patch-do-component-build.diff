@@ -1,6 +1,21 @@
 --- a/bigtop-packages/src/common/pig/do-component-build	2016-05-20 10:42:15.000000000 -0500
 +++ b/bigtop-packages/src/common/pig/do-component-build	2017-09-07 15:29:10.000000000 -0500
-@@ -52,13 +52,13 @@ BUILD_OPTS="-Djavac.version=${JDK_VERSIO
+@@ -18,6 +18,14 @@ set -ex
+
+ . `dirname ${0}`/bigtop.bom
+
++sed -e '/hbase95.version=/d' \
++    -e '/hive.version=/d' \
++    -e '/zookeeper.version=/d' \
++    -e '/hadoop-common.version=/d' \
++    -e '/hadoop-hdfs.version=/d' \
++    -e '/hadoop-mapreduce.version=/d' \
++    -i ivy/library.properties
++
+ cat <<__EOT__ >> ivy/libraries.properties
+
+ hbase95.version=$HBASE_VERSION
+@@ -52,13 +60,13 @@ BUILD_OPTS="-Djavac.version=${JDK_VERSIO
  # [ivy:resolve]                :: org.mortbay.jetty#jetty;6.1.26!jetty.zip
  # [ivy:resolve]                ::::::::::::::::::::::::::::::::::::::::::::::
  for h in ${HOME} `mvn help:system | grep '^user.home=' | cut -f2 -d=` ; do
