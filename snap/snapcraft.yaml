@@ -206,6 +206,14 @@ parts:
         sed -e 's/checkmodified="true"/checkmodified="false"/' -i ivy/ivysettings.xml
         curl -O https://s3.amazonaws.com/jujubigdata/snap-resources/pig/pig-ivy-cache.tgz 
         tar -C ${HOME} -zxf pig-ivy-cache.tgz
+
+        # tell the resolve task to only use the local cache
+        sed -e 's/<ivy:resolve/<ivy:resolve useCacheOnly="true"/' -i build.xml
+        sed -e 's/changing="true"/changing="false"/' -i ivy.xml
+
+        # dont blow away our cache!
+        sed -e 's|${h}/.ivy2/cache/\*jetty||' -i \
+          ../../bigtop/build/bigtop-packages/src/common/pig/do-component-build
       fi
     install: |
       # Do not define build tasks because we want the ant plugin to setup any
