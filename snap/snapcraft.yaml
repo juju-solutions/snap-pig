@@ -177,6 +177,23 @@ parts:
       sed -e 's/getProperty("user.home")/getenv("SNAP_USER_DATA")/' -i src/org/apache/pig/Main.java
       sed -e 's/getProperty("user.dir")/getenv("SNAP_USER_DATA")/' -i src/org/apache/pig/Main.java
 
+      sed -e '/hbase95.version=/d' \
+          -e '/hive.version=/d' \
+          -e '/zookeeper.version=/d' \
+          -e '/hadoop-common.version=/d' \
+          -e '/hadoop-hdfs.version=/d' \
+          -e '/hadoop-mapreduce.version=/d' \
+          -i ivy/libraries.properties
+
+      echo hbase95.version=1.1.9 >> ivy/libraries.properties
+      echo hive.version=1.2.1 >> ivy/libraries.properties
+      echo zookeeper.version=3.4.6 >> ivy/libraries.properties
+      echo hadoop-common.version=2.7.3 >> ivy/libraries.properties
+      echo hadoop-hdfs.version=2.7.3 >> ivy/libraries.properties
+      echo hadoop-mapreduce.version=2.7.3 >> ivy/libraries.properties
+
+      sed -e 's|conf="compile,runtime,test">|>|' -i build.xml
+
       # proxied builds need help when ant tries to get ivy (ANT_OPTS is not enough)
       # NB: ${http.var} will be set by the ant plugin when appropriate
       if [ -n "${http_proxy}" ]; then
@@ -190,7 +207,6 @@ parts:
           <setproxy proxyhost="${http.proxyHost}" proxyport="${http.proxyPort}" \
               proxyuser="${http.proxyUser}" proxypassword="${http.proxyPassword}"/>' \
           -i build.xml
-        sed -e 's|conf="compile,runtime,test">|>|' -i build.xml
       elif [ -n "${https_proxy}" ]; then
         sed -e '/name="ivy-download"/a \
           <setproxy proxyhost="${https.proxyHost}" proxyport="${https.proxyPort}" \
