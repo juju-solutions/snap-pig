@@ -1,0 +1,6 @@
+#!/bin/bash
+
+set -eux
+
+# setup read/write unversioned mountpoints for our plugs
+mkdir -p ${SNAP_COMMON}/hadoop-conf
