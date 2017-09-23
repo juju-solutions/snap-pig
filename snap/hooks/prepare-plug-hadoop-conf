@@ -2,5 +2,5 @@
 
 set -eux
 
-# setup read/write unversioned mountpoints for our plugs
+# setup read/write unversioned dir for our plug mount
 mkdir -p ${SNAP_COMMON}/hadoop-conf

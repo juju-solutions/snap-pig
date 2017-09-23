@@ -26,7 +26,7 @@ plugs:
   hadoop-conf:
     interface: content
     content: hadoop-conf
-    target: $SNAP/hbase
+    target: $SNAP_COMMON/hadoop-conf
   zookeeper:
     interface: content
     content: zookeeper
@@ -236,7 +236,6 @@ parts:
 
       # create dirs for potential slot contents
       install -d -m 0755 $SNAPCRAFT_PART_INSTALL/hadoop
-      install -d -m 0755 $SNAPCRAFT_PART_INSTALL/etc/hadoop
       install -d -m 0755 $SNAPCRAFT_PART_INSTALL/hbase
       install -d -m 0755 $SNAPCRAFT_PART_INSTALL/hive
       install -d -m 0755 $SNAPCRAFT_PART_INSTALL/zookeeper
