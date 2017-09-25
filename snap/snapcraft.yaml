@@ -26,7 +26,7 @@ plugs:
   hadoop-conf:
     interface: content
     content: hadoop-conf
-    target: $SNAP_COMMON/hadoop-conf
+    target: $SNAP_COMMON
   zookeeper:
     interface: content
     content: zookeeper
