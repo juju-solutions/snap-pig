@@ -1,9 +1,0 @@
-#!/bin/bash
-
-set -eux
-
-# setup read/write unversioned dir for our plug mount
-mkdir -p ${SNAP_COMMON}/hadoop-conf
-mkdir -p $SNAP_COMMON/hadoop-conf
-mkdir -p $SNAP_COMMON/hadoop-slot
-mkdir -p ${SNAP_COMMON}/hadoop-slot-bracket
