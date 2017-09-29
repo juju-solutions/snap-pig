@@ -1,14 +1,14 @@
 name: pig
-version: '1.2.0-snap1'
-summary: Analyze large data sets with Pig Latin
+version: '1.2.0'
+summary: Apache Pig
 description: |
   Apache Pig is a platform for analyzing large data sets that consists
-  of a high-level language for expressing data analysis programs,
+  of a high-level language (Pig Latin) for expressing data analysis programs,
   coupled with infrastructure for evaluating these programs
 
-  This snap installs Pig 0.15.0 from the Apache Bigtop 1.2.0 release.
-grade: devel # must be 'stable' to release into candidate/stable channels
-confinement: strict # use 'strict' once you have the right plugs and slots
+  This snap installs Pig 0.15.0 and is compatible with Apache Bigtop 1.2.0.
+grade: stable
+confinement: strict
 
 apps:
   pig:
@@ -239,6 +239,14 @@ parts:
       install -d -m 0755 $SNAPCRAFT_PART_INSTALL/hbase
       install -d -m 0755 $SNAPCRAFT_PART_INSTALL/hive
       install -d -m 0755 $SNAPCRAFT_PART_INSTALL/zookeeper
+    stage:
+      - etc/pig
+      - hadoop
+      - hbase
+      - hive
+      - usr/lib/pig
+      - zookeeper
+
   wrappers:
     after:
       - pig
