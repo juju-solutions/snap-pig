@@ -6,12 +6,12 @@
 
 # Setup environment
 # NB: all snaps that plug into hadoop are expected to have $SNAP/hadoop and
-# $SNAP/etc/hadoop dirs that will be automatically mounted when connected.
-if [ -e ${SNAP}/hadoop/wrappers/common-wrapper.sh ]; then
-  . ${SNAP}/hadoop/wrappers/common-wrapper.sh
+# $SNAP_DATA/etc/hadoop dirs that will be automatically mounted when connected.
+if [ -e ${SNAP}/hadoop/wrappers/hadoop-common-wrapper.sh ]; then
+  . ${SNAP}/hadoop/wrappers/hadoop-common-wrapper.sh
 else
-  echo "ERROR: Could not find 'common-wrapper.sh':"
-  echo "${SNAP}/hadoop/wrappers/common-wrapper.sh"
+  echo "ERROR: Could not find 'hadoop-common-wrapper.sh':"
+  echo "${SNAP}/hadoop/wrappers/hadoop-common-wrapper.sh"
   echo "Please verify the hadoop snap is installed and connected."
   exit 1
 fi
