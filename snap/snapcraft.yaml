@@ -241,11 +241,7 @@ parts:
       #install -d -m 0755 $SNAPCRAFT_PART_INSTALL/zookeeper
     stage:
       - etc/pig
-      - hadoop
-      - hbase
-      - hive
       - usr/lib/pig
-      - zookeeper
 
   wrappers:
     after:
