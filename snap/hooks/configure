@@ -3,7 +3,7 @@
 set -eux
 
 # setup root-writable versioned dirs
-mkdir -p ${SNAP_DATA}/etc/hadoop
+#mkdir -p ${SNAP_DATA}/etc/hadoop
 mkdir -p ${SNAP_DATA}/var/lib/bigtop
 
 # setup pig config
