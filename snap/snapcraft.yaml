@@ -235,13 +235,18 @@ parts:
       ln -s /var/snap/pig/current/etc/pig/conf $SNAPCRAFT_PART_INSTALL/usr/lib/pig/conf
 
       # create dirs for potential slot contents
-      #install -d -m 0755 $SNAPCRAFT_PART_INSTALL/hadoop
-      #install -d -m 0755 $SNAPCRAFT_PART_INSTALL/hbase
-      #install -d -m 0755 $SNAPCRAFT_PART_INSTALL/hive
-      #install -d -m 0755 $SNAPCRAFT_PART_INSTALL/zookeeper
+      # NB: must be done now as $SNAP will be read-only when installed
+      install -d -m 0755 $SNAPCRAFT_PART_INSTALL/hadoop
+      install -d -m 0755 $SNAPCRAFT_PART_INSTALL/hbase
+      install -d -m 0755 $SNAPCRAFT_PART_INSTALL/hive
+      install -d -m 0755 $SNAPCRAFT_PART_INSTALL/zookeeper
     stage:
       - etc/pig
+      - hadoop
+      - hbase
+      - hive
       - usr/lib/pig
+      - zookeeper
 
   wrappers:
     after:
